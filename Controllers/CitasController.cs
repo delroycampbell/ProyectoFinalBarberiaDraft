@@ -24,8 +24,9 @@ namespace ProyectoFinalDraft.Controllers
             {
             var appDbContext = _context.Cita
                 .Include(c => c.EstadoCita)
-                .Include(c => c.Usuario);
-
+                .Include(c => c.Usuario)
+                .Include(C => C.CitaServicios)
+                    .ThenInclude(cs => cs.Servicio);
             return View(await appDbContext.ToListAsync());
             }
 
@@ -55,26 +56,49 @@ namespace ProyectoFinalDraft.Controllers
             {
             ViewData["EstadoCitaId"] = new SelectList(_context.EstadoCita, "EstadoCitaId", "Nombre");
             ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "NombreCompleto");
+            //Agregar la lista de servicios en el formulario 
+            ViewData["Servicios"] = _context.Servicio.ToList(); 
             return View();
             }
 
         // POST: Citas/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CitaId,Fecha,Detalle,EstadoCitaId,UsuarioId")] Cita cita)
+        public async Task<IActionResult> Create(
+         [Bind("CitaId,Fecha,Detalle,EstadoCitaId,UsuarioId")] Cita cita,
+         string ServiciosSeleccionados)
             {
             try
                 {
+                // Crear cita
                 _context.Add(cita);
                 await _context.SaveChangesAsync();
+
+                // Convertir string a lista
+                if (!string.IsNullOrEmpty(ServiciosSeleccionados))
+                    {
+                    var servicioId = int.Parse(ServiciosSeleccionados);
+
+                    _context.CitaServicio.Add(new CitaServicio
+                        {
+                        CitaId = cita.CitaId,
+                        ServicioId = servicioId
+                        });
+
+                    await _context.SaveChangesAsync();
+                    }
+
                 return RedirectToAction(nameof(Index));
                 }
-            catch (Exception) { }
-
-            ViewData["EstadoCitaId"] = new SelectList(_context.EstadoCita, "EstadoCitaId", "Nombre", cita.EstadoCitaId);
-            ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "NombreCompleto", cita.UsuarioId);
-            return View(cita);
+            catch (Exception)
+                {
+                ViewData["EstadoCitaId"] = new SelectList(_context.EstadoCita, "EstadoCitaId", "Nombre", cita.EstadoCitaId);
+                ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "NombreCompleto", cita.UsuarioId);
+                ViewData["Servicios"] = _context.Servicio.ToList();
+                return View(cita);
+                }
             }
+
 
         // GET: Citas/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -90,6 +114,7 @@ namespace ProyectoFinalDraft.Controllers
                 }
             ViewData["EstadoCitaId"] = new SelectList(_context.EstadoCita, "EstadoCitaId", "Nombre", cita.EstadoCitaId);
             ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "NombreCompleto", cita.UsuarioId);
+            ViewData["Servicios"] = _context.Servicio.ToList();
 
             return View(cita);
             }
@@ -127,6 +152,7 @@ namespace ProyectoFinalDraft.Controllers
                 {
                 ViewData["EstadoCitaId"] = new SelectList(_context.EstadoCita, "EstadoCitaId", "Nombre", cita.EstadoCitaId);
                 ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "NombreCompleto", cita.UsuarioId);
+                ViewData["Servicios"] = _context.Servicio.ToList();
                 return View(cita);
                 }
             }

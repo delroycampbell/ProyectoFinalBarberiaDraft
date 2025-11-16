@@ -14,11 +14,14 @@ namespace ProyectoFinalDraft.Data
             {
             }
 
-        public DbSet<ProyectoFinalDraft.Models.Usuario> Usuario { get; set; } = default!;
-        public DbSet<ProyectoFinalDraft.Models.Rol> Rol { get; set; } = default!;
-        public DbSet<ProyectoFinalDraft.Models.Cita> Cita { get; set; } = default!;
-        public DbSet<ProyectoFinalDraft.Models.EstadoCita> EstadoCita { get; set; } = default!;
-        public DbSet<ProyectoFinalDraft.Models.Factura> Factura { get; set; } = default!;
+        public DbSet<Usuario> Usuario { get; set; } = default!;
+        public DbSet<Rol> Rol { get; set; } = default!;
+        public DbSet<Cita> Cita { get; set; } = default!;
+        public DbSet<EstadoCita> EstadoCita { get; set; } = default!;
+        public DbSet<Factura> Factura { get; set; } = default!;
+        public DbSet<Servicio> Servicio { get; set; } = default!;
+        public DbSet<CitaServicio> CitaServicio { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -73,7 +76,7 @@ namespace ProyectoFinalDraft.Data
                 .HasForeignKey (u => u.CitaId);
 
             }
-        public DbSet<ProyectoFinalDraft.Models.Servicio> Servicio { get; set; } = default!;
+    
 
 
         }

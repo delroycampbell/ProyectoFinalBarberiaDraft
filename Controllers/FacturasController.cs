@@ -50,8 +50,6 @@ namespace ProyectoFinalDraft.Controllers
         // GET: Facturas/Create
         public IActionResult Create()
             {
-            ViewData["CitaId"] = new SelectList(_context.Cita, "CitaId", "CitaId");
-            ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "Nombre");
             return View();
             }
 
