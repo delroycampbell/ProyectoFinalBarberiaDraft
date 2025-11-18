@@ -41,6 +41,7 @@ namespace ProyectoFinalDraft.Controllers
             var cita = await _context.Cita
                 .Include(c => c.EstadoCita)
                 .Include(c => c.Usuario)
+                .Include(c => c.Factura)
                 .FirstOrDefaultAsync(m => m.CitaId == id);
 
             if (cita == null)
