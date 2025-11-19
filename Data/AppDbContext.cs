@@ -70,13 +70,10 @@ namespace ProyectoFinalDraft.Data
                 .WithMany(s => s.CitaServicios)
                 .HasForeignKey(cs => cs.ServicioId);
 
-            modelBuilder.Entity<Factura>()
-                .HasOne(f => f.Usuario)
-                .WithMany(u => u.Facturas)
-                .HasForeignKey (u => u.CitaId);
+ 
 
             }
-    
+
 
 
         }
