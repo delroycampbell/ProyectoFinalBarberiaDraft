@@ -105,7 +105,6 @@ namespace ProyectoFinalDraft.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Factura factura)
             {
-            // Buscar cita con todo lo necesario
             var cita = await _context.Cita
                 .Include(c => c.Usuario)
                 .Include(c => c.CitaServicios)
@@ -118,22 +117,34 @@ namespace ProyectoFinalDraft.Controllers
                 return View(factura);
                 }
 
-            // Calcular montos derivados
+            // Evitar facturación doble
+            if (cita.Factura != null)
+                {
+                ModelState.AddModelError("", "Esta cita ya tiene una factura.");
+                return View(factura);
+                }
+
+            // Calcular totales
             var subtotal = cita.CitaServicios.Sum(s => s.Servicio.Precio);
             var iva = subtotal * 0.13m;
             var total = subtotal + iva;
 
-            // Cargar datos automáticos
             factura.UsuarioId = cita.UsuarioId;
             factura.Total = total;
             factura.Fecha = DateTime.Now;
 
+            // Marcar cita como completada
+            cita.EstadoCitaId = 3;
+            _context.Update(cita);
+
             // Guardar factura
             _context.Add(factura);
-            await _context.SaveChangesAsync();
 
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
             }
+
+
 
 
         // GET: Facturas/Edit/5
