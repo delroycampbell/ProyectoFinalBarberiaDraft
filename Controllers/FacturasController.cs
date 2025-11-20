@@ -38,6 +38,7 @@ namespace ProyectoFinalDraft.Controllers
             var factura = await _context.Factura
                 .Include(f => f.Cita)
                 .Include(f => f.Usuario)
+                .Include(f => f.Usuario)
                 .FirstOrDefaultAsync(m => m.FacturaId == id);
             if (factura == null)
                 {
@@ -87,6 +88,7 @@ namespace ProyectoFinalDraft.Controllers
             return Json(new
                 {
                 usuarioId = cita.UsuarioId,
+                usuarioNombre = cita.Usuario.NombreCompleto,
                 total = total,
                 fecha = DateTime.Now.ToString("yyyy-MM-dd")
                 });
