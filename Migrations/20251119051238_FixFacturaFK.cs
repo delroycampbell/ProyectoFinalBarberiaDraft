@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable //`test
+#nullable disable
 
 namespace ProyectoFinalDraft.Migrations
 {

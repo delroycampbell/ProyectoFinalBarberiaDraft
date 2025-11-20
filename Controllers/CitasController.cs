@@ -58,7 +58,7 @@ namespace ProyectoFinalDraft.Controllers
             ViewData["EstadoCitaId"] = new SelectList(_context.EstadoCita, "EstadoCitaId", "Nombre");
             ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "NombreCompleto");
             //Agregar la lista de servicios en el formulario 
-            ViewData["Servicios"] = _context.Servicio.ToList(); 
+            ViewData["Servicios"] = _context.Servicio.ToList();
             return View();
             }
 
@@ -69,29 +69,38 @@ namespace ProyectoFinalDraft.Controllers
          [Bind("CitaId,Fecha,Detalle,EstadoCitaId,UsuarioId")] Cita cita,
          string ServiciosSeleccionados)
             {
+            // VALIDACIÓN: debe seleccionar al menos un servicio
+            if (string.IsNullOrEmpty(ServiciosSeleccionados))
+                {
+                ModelState.AddModelError("", "Debe seleccionar al menos un servicio.");
+
+                ViewData["EstadoCitaId"] = new SelectList(_context.EstadoCita, "EstadoCitaId", "Nombre", cita.EstadoCitaId);
+                ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "NombreCompleto", cita.UsuarioId);
+                ViewData["Servicios"] = _context.Servicio.ToList();
+
+                return View(cita);
+                }
+
             try
                 {
-                // Crear cita
+                // Guardar cita primero
                 _context.Add(cita);
                 await _context.SaveChangesAsync();
 
-                // Convertir string a lista
-                if (!string.IsNullOrEmpty(ServiciosSeleccionados))
+                // Guardar servicio asociado
+                var servicioId = int.Parse(ServiciosSeleccionados);
+
+                _context.CitaServicio.Add(new CitaServicio
                     {
-                    var servicioId = int.Parse(ServiciosSeleccionados);
+                    CitaId = cita.CitaId,
+                    ServicioId = servicioId
+                    });
 
-                    _context.CitaServicio.Add(new CitaServicio
-                        {
-                        CitaId = cita.CitaId,
-                        ServicioId = servicioId
-                        });
-
-                    await _context.SaveChangesAsync();
-                    }
+                await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
                 }
-            catch (Exception)
+            catch
                 {
                 ViewData["EstadoCitaId"] = new SelectList(_context.EstadoCita, "EstadoCitaId", "Nombre", cita.EstadoCitaId);
                 ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "NombreCompleto", cita.UsuarioId);
@@ -99,6 +108,7 @@ namespace ProyectoFinalDraft.Controllers
                 return View(cita);
                 }
             }
+
 
 
         // GET: Citas/Edit/5

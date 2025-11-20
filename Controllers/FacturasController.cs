@@ -50,28 +50,102 @@ namespace ProyectoFinalDraft.Controllers
         // GET: Facturas/Create
         public IActionResult Create()
             {
+            // Solo citas sin factura
+            var citasSinFactura = _context.Cita
+                .Where(c => c.Factura == null)
+                .Select(c => new
+                    {
+                    c.CitaId,
+                    Texto = "Cita #" + c.CitaId + " - " + c.Fecha.ToString("dd/MM/yyyy")
+                    })
+                .ToList();
+
+            ViewBag.CitaId = new SelectList(citasSinFactura, "CitaId", "Texto");
+
             return View();
             }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetFacturaDatos(int citaId)
+            {
+            var cita = await _context.Cita
+                .Include(c => c.Usuario)
+                .Include(c => c.CitaServicios)
+                .ThenInclude(cs => cs.Servicio)
+                .FirstOrDefaultAsync(c => c.CitaId == citaId);
+
+            if (cita == null)
+                {
+                return Json(new { error = "Cita no encontrada" });
+                }
+
+            var subtotal = cita.CitaServicios.Sum(s => s.Servicio.Precio);
+            var iva = subtotal * 0.13m;
+            var total = subtotal + iva;
+
+            return Json(new
+                {
+                usuarioId = cita.UsuarioId,
+                total = total,
+                fecha = DateTime.Now.ToString("yyyy-MM-dd")
+                });
+            }
+        //El endpoint recibe un citaId.
+        //Busca la cita real con su usuario y servicios.
+        //Calcula los valores.
+        //Devuelve un JSON.
+        //El script de tu vista llena los campos.
+
 
         // POST: Facturas/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FacturaId,Fecha,Detalle,Total,CitaId,UsuarioId")] Factura factura)
+        public async Task<IActionResult> Create(Factura factura)
             {
+            var cita = await _context.Cita
+                .Include(c => c.Usuario)
+                .Include(c => c.CitaServicios)
+                .ThenInclude(cs => cs.Servicio)
+                .FirstOrDefaultAsync(c => c.CitaId == factura.CitaId);
 
-            try
+            if (cita == null)
                 {
-                _context.Add(factura);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", "La cita no existe.");
+                return View(factura);
                 }
-            catch { }
-            ViewData["CitaId"] = new SelectList(_context.Cita, "CitaId", "CitaId", factura.CitaId);
-            ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "Nombre", factura.UsuarioId);
-            return View(factura);
+
+            // Evitar facturación doble
+            if (cita.Factura != null)
+                {
+                ModelState.AddModelError("", "Esta cita ya tiene una factura.");
+                return View(factura);
+                }
+
+            // Calcular totales
+            var subtotal = cita.CitaServicios.Sum(s => s.Servicio.Precio);
+            var iva = subtotal * 0.13m;
+            var total = subtotal + iva;
+
+            factura.UsuarioId = cita.UsuarioId;
+            factura.Total = total;
+            factura.Fecha = DateTime.Now;
+
+            // Marcar cita como completada
+            cita.EstadoCitaId = 3;
+            _context.Update(cita);
+
+            // Guardar factura
+            _context.Add(factura);
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
             }
+
+
+
 
         // GET: Facturas/Edit/5
         public async Task<IActionResult> Edit(int? id)
