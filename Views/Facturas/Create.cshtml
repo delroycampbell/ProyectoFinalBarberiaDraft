@@ -66,21 +66,43 @@
         }
 
     <script>
-        // Cargar datos de la cita automáticamente
-        document.getElementById("citaSelect").addEventListener("change", function () {
-            const citaId = this.value;
+        function cargarDatosFactura() {
+            const select = document.getElementById("citaSelect");
+            const citaId = select.value;
 
             if (!citaId) return;
 
             fetch(`/Facturas/GetFacturaDatos?citaId=${citaId}`)
                 .then(res => res.json())
                 .then(data => {
-
                     document.getElementById("usuarioInput").value = data.usuarioId;
                     document.getElementById("usuarioNombreInput").value = data.usuarioNombre;
                     document.getElementById("totalInput").value = data.total;
                     document.getElementById("fechaInput").value = data.fecha;
                 });
+        }
+
+        // Cuando el usuario cambia la cita
+        document.getElementById("citaSelect").addEventListener("change", cargarDatosFactura);
+
+        // Cargar automáticamente si solo hay una cita
+        window.addEventListener("DOMContentLoaded", function () {
+            const select = document.getElementById("citaSelect");
+
+            // CASO 1: solo una opción real
+            if (select.options.length === 1) {
+                cargarDatosFactura();
+                return;
+            }
+
+            // CASO 2: dos opciones pero la primera NO es vacía
+            if (select.options.length === 2 && select.options[0].value !== "") {
+                // Selecciona automáticamente la primera cita
+                select.selectedIndex = 0;
+                cargarDatosFactura();
+                return;
+            }
         });
     </script>
     }
+
