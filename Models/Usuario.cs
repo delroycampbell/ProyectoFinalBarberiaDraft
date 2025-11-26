@@ -27,7 +27,6 @@ namespace ProyectoFinalDraft.Models
         //Relacion con IdentityUser
         public string? IdentityUserId { get; set; }
         public ApplicationUser IdentityUser { get; set; }
-         
 
         }
     }

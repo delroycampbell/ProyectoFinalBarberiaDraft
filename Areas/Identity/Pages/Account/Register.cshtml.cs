@@ -18,33 +18,37 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using ProyectoFinalDraft.Data;
 using ProyectoFinalDraft.Models;
 
 namespace ProyectoFinalDraft.Areas.Identity.Pages.Account
-{
-    public class RegisterModel : PageModel
     {
+    public class RegisterModel : PageModel
+        {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly AppDbContext _context;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
-        {
+            IEmailSender emailSender,
+            AppDbContext context)
+            {
             _userManager = userManager;
             _userStore = userStore;
             _emailStore = GetEmailStore();
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
-        }
+            _context = context;
+            }
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -70,7 +74,7 @@ namespace ProyectoFinalDraft.Areas.Identity.Pages.Account
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public class InputModel
-        {
+            {
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -107,31 +111,54 @@ namespace ProyectoFinalDraft.Areas.Identity.Pages.Account
             [StringLength(50)]
             [Display(Name = "NombreCompleto")]
             public string NombreCompleto { get; set; }
+
+            [Phone]
+            [StringLength(15)]
+            [Display(Name = "Phone number")]
+            public string PhoneNumber { get; set; }
             }
 
 
         public async Task OnGetAsync(string returnUrl = null)
-        {
+            {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-        }
+            }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
-        {
+            {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
-            {
+                {
                 var user = CreateUser();
+
+                //IdentityUserId se asigna automaticamente al crear el usuario en Identity
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 user.NombreCompleto = Input.NombreCompleto;
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
-                {
+                    {
                     _logger.LogInformation("User created a new account with password.");
+
+                    //Guardar en la tabla Usuario
+
+                    var nuevoUsuario = new Usuario
+                        {
+                        NombreCompleto = Input.NombreCompleto,
+                        Correo = Input.Email,
+                        IdentityUserId = user.Id, //Relación con IdentityUser
+                        Telefono = Input.PhoneNumber,
+                        RolId = 3 // Asignar rol predeterminado "Cliente"
+
+                        };
+
+                    _context.Usuario.Add(nuevoUsuario);
+                    await _context.SaveChangesAsync();
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -146,46 +173,46 @@ namespace ProyectoFinalDraft.Areas.Identity.Pages.Account
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
+                        {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
+                        }
                     else
-                    {
+                        {
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
+                        }
+                    }
+                foreach (var error in result.Errors)
+                    {
+                    ModelState.AddModelError(string.Empty, error.Description);
                     }
                 }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
 
             // If we got this far, something failed, redisplay form
             return Page();
-        }
+            }
 
         private ApplicationUser CreateUser()
-        {
+            {
             try
-            {
+                {
                 return Activator.CreateInstance<ApplicationUser>();
-            }
+                }
             catch
-            {
+                {
                 throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
                     $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
+                }
             }
-        }
 
         private IUserEmailStore<ApplicationUser> GetEmailStore()
-        {
-            if (!_userManager.SupportsUserEmail)
             {
+            if (!_userManager.SupportsUserEmail)
+                {
                 throw new NotSupportedException("The default UI requires a user store with email support.");
-            }
+                }
             return (IUserEmailStore<ApplicationUser>)_userStore;
+            }
         }
     }
-}

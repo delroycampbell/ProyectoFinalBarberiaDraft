@@ -2,17 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProyectoFinalDraft.Models;
 
 namespace ProyectoFinalDraft.Data
     {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
         {
         public AppDbContext(DbContextOptions<AppDbContext> options)
-  : base(options)
-            {
-            }
+  : base(options) { }
 
         public DbSet<Usuario> Usuario { get; set; } = default!;
         public DbSet<Rol> Rol { get; set; } = default!;
@@ -70,11 +69,14 @@ namespace ProyectoFinalDraft.Data
                 .WithMany(s => s.CitaServicios)
                 .HasForeignKey(cs => cs.ServicioId);
 
- 
+            // Relación Usuario <-> IdentityUser (N:1) sin cascada
+            modelBuilder.Entity<Usuario>()
+                .HasOne(u => u.IdentityUser)
+                .WithMany()
+                .HasForeignKey(u => u.IdentityUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             }
-
-
 
         }
     }
