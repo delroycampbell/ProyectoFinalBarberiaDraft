@@ -24,10 +24,5 @@ namespace ProyectoFinalDraft.Models
         //Relacion con Cita y Facturas
         public ICollection<Cita> Citas { get; set; } = new List<Cita>();
 
-        //Relacion con IdentityUser
-        public string? IdentityUserId { get; set; }
-        public ApplicationUser IdentityUser { get; set; }
-         
-
         }
     }
