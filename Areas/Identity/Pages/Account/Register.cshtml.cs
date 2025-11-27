@@ -49,6 +49,7 @@ namespace ProyectoFinalDraft.Areas.Identity.Pages.Account
             _emailSender = emailSender;
             _context = context;
             }
+       
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -144,6 +145,8 @@ namespace ProyectoFinalDraft.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                     {
                     _logger.LogInformation("User created a new account with password.");
+
+                    await _userManager.AddToRoleAsync(user, "Cliente");
 
                     //Guardar en la tabla Usuario
 
