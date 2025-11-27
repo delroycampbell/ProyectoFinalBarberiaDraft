@@ -28,5 +28,9 @@ namespace ProyectoFinalDraft.Models
         public string? IdentityUserId { get; set; }
         public ApplicationUser IdentityUser { get; set; }
 
+        //Subscricion a promociones
+
+        public bool EstaSuscritoPromociones { get; set; } = false;
+
         }
     }
