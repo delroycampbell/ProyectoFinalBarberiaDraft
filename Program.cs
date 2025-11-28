@@ -3,6 +3,8 @@ using ProyectoFinalDraft.Data;
 using Microsoft.AspNetCore.Identity;
 using ProyectoFinalDraft.Models;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using ProyectoFinalDraft.Interfaces;
+using ProyectoFinalDraft.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,9 +44,21 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 //No enviar correos  
 builder.Services.AddTransient<IEmailSender>(provider => new NoOpEmailSender());
+builder.Services.AddSingleton<ISubjectPromotion, NotificadorPromocion>();
+builder.Services.AddSingleton<IObserverPromotion, FakeEmailPromotionObserver>();
 
 var app = builder.Build();
 app.MapRazorPages();
+
+// Conectar Subject con sus Observadores
+using (var scope = app.Services.CreateScope())
+    {
+    var subject = scope.ServiceProvider.GetRequiredService<ISubjectPromotion>();
+    var observer = scope.ServiceProvider.GetRequiredService<IObserverPromotion>();
+
+    subject.Attach(observer);
+    }
+
 
 
 // SEED DE ROLES

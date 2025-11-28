@@ -49,7 +49,7 @@ namespace ProyectoFinalDraft.Areas.Identity.Pages.Account
             _emailSender = emailSender;
             _context = context;
             }
-       
+
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -110,13 +110,17 @@ namespace ProyectoFinalDraft.Areas.Identity.Pages.Account
             /// </summary>
             [Required]
             [StringLength(50)]
-            [Display(Name = "NombreCompleto")]
+            [Display(Name = "Nombre Completo")]
             public string NombreCompleto { get; set; }
 
             [Phone]
             [StringLength(15)]
-            [Display(Name = "Phone number")]
+            [Display(Name = "Numero Telefono")]
             public string PhoneNumber { get; set; }
+
+
+            [Display(Name = "Deseo recibir Promociones")]
+            public bool EstaSuscritoPromociones { get; set; }
             }
 
 
@@ -156,7 +160,9 @@ namespace ProyectoFinalDraft.Areas.Identity.Pages.Account
                         Correo = Input.Email,
                         IdentityUserId = user.Id, //Relación con IdentityUser
                         Telefono = Input.PhoneNumber,
-                        RolId = 3 // Asignar rol predeterminado "Cliente"
+                        RolId = 3, // Asignar rol predeterminado "Cliente"
+                        EstaSuscritoPromociones = Input.EstaSuscritoPromociones
+
 
                         };
 

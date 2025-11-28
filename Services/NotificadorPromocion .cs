@@ -3,7 +3,7 @@ using ProyectoFinalDraft.Models;
 
 namespace ProyectoFinalDraft.Services
     {
-    public class NotifadorPromocion : ISubjectPromotion
+    public class NotificadorPromocion : ISubjectPromotion
         {
         private readonly List<IObserverPromotion> observadores = new List<IObserverPromotion>();
         public void Attach(IObserverPromotion observer)

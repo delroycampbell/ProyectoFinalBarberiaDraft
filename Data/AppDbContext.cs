@@ -77,6 +77,7 @@ namespace ProyectoFinalDraft.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             }
+        public DbSet<ProyectoFinalDraft.Models.Promocion> Promocion { get; set; } = default!;
 
         }
     }
