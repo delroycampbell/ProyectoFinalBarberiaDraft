@@ -1,22 +1,95 @@
+/* Tamaño base */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* Estilos de enfoque */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+/* Layout general */
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    font-family: 'Poppins', sans-serif !important;
+}
+
+/* ---------------------------
+     SECCIÓN HERO (INICIO)
+------------------------------ */
+
+/* Fondo del inicio */
+.hero-section {
+    height: 85vh;
+    background-image: url('/imag/fondo1.jpg'); /* <-- TU IMAGEN */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+    /* Capa oscura */
+    .hero-section::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.45);
+        z-index: 1;
+    }
+
+/* Texto del inicio */
+.hero-text {
+    position: relative;
+    z-index: 2;
+    color: white;
+    text-align: center;
+    padding-top: 150px;
+    font-size: 48px;
+    font-weight: 700;
+    animation: fadeDown 1.5s ease-out;
+}
+
+/* Animación */
+@keyframes fadeDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Subtítulo */
+.hero-text p {
+    font-size: 1.3rem;
+    font-weight: 300;
+
+}
+
+/* Cambiar color del nombre de la barbería */
+.brand-white {
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 1.5rem;
 }
