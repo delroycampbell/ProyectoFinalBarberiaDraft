@@ -1,8 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ProyectoFinalDraft.Data;
-using Microsoft.AspNetCore.Identity;
-using ProyectoFinalDraft.Models;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
+using ProyectoFinalDraft.Data;
+using ProyectoFinalDraft.Interfaces;
+using ProyectoFinalDraft.Models;
+using ProyectoFinalDraft.Services;
+using static System.Formats.Asn1.AsnWriter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,25 +45,36 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 //No enviar correos  
 builder.Services.AddTransient<IEmailSender>(provider => new NoOpEmailSender());
+builder.Services.AddSingleton<ISubjectPromotion, NotificadorPromocion>();
+builder.Services.AddSingleton<IObserverPromotion, FakeEmailPromotionObserver>();
 
 var app = builder.Build();
 app.MapRazorPages();
 
-
-// SEED DE ROLES
+// Conectar Subject con sus Observadores
 using (var scope = app.Services.CreateScope())
     {
-    var RoleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = { "Admin", "Barbero", "Cliente" };
+    var subject = scope.ServiceProvider.GetRequiredService<ISubjectPromotion>();
+    var observer = scope.ServiceProvider.GetRequiredService<IObserverPromotion>();
 
-    foreach (var rol in roles)
-        {
-        if (!await RoleManager.RoleExistsAsync(rol))
-            {
-            await RoleManager.CreateAsync(new IdentityRole(rol));
-            }
-        }
+    subject.Attach(observer);
     }
+
+
+
+// SEED DE ROLES
+
+using (var scope = app.Services.CreateScope())
+    {
+    var services = scope.ServiceProvider;
+
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var context = services.GetRequiredService<AppDbContext>();
+
+    await SeedUsers.SeedAsync(userManager, roleManager, context);
+    }
+
 
 if (!app.Environment.IsDevelopment())
     {

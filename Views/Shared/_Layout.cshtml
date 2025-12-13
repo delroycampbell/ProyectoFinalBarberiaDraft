@@ -19,36 +19,54 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Citas" asp-action="Index">Citas</a>
+                            <a class="nav-link text-dark" asp-controller="Citas" asp-action="Index">Citas</a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Facturas" asp-action="Index">Facturas</a>
+                            <a class="nav-link text-dark" asp-controller="Facturas" asp-action="Index">Facturas</a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="EstadoCitas" asp-action="Index">EstadoCitas</a>
+                            <a class="nav-link text-dark" asp-controller="EstadoCitas" asp-action="Index">EstadoCitas</a>
                         </li>
-                        </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Roles" asp-action="Index">Roles</a>
+                            <a class="nav-link text-dark" asp-controller="Roles" asp-action="Index">Roles</a>
                         </li>
-                        </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Usuarios" asp-action="Index">Usuarios</a>
+                            <a class="nav-link text-dark" asp-controller="Usuarios" asp-action="Index">Usuarios</a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Servicios" asp-action="Index">Servicios</a>
+                            <a class="nav-link text-dark" asp-controller="Servicios" asp-action="Index">Servicios</a>
                         </li>
-                           
+
+                        <!-- ADMIN: CRUD de promociones -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Promociones" asp-action="Index">Promociones (Admin)</a>
                         </li>
+
+                        <!-- CLIENTE: Vista segun suscripcion -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Promociones" asp-action="MisPromociones">
+                                Mis promociones
+                            </a>
+                        </li>
+
                     </ul>
-                
+
+
                 </div>
                 <partial name="_LoginPartial" />
             </div>
