@@ -150,7 +150,7 @@ namespace ProyectoFinalDraft.Areas.Identity.Pages.Account
                     {
                     _logger.LogInformation("User created a new account with password.");
 
-                    await _userManager.AddToRoleAsync(user, "Admin");
+                    await _userManager.AddToRoleAsync(user, "Cliente");
 
                     //Guardar en la tabla Usuario
 
@@ -160,7 +160,7 @@ namespace ProyectoFinalDraft.Areas.Identity.Pages.Account
                         Correo = Input.Email,
                         IdentityUserId = user.Id, //Relación con IdentityUser
                         Telefono = Input.PhoneNumber,
-                        RolId = 1, // Asignar rol predeterminado "Cliente"
+                        RolId = 3, // Asignar rol predeterminado "Cliente"
                         EstaSuscritoPromociones = Input.EstaSuscritoPromociones
 
                         };
