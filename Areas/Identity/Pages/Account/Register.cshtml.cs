@@ -163,7 +163,6 @@ namespace ProyectoFinalDraft.Areas.Identity.Pages.Account
                         RolId = 3, // Asignar rol predeterminado "Cliente"
                         EstaSuscritoPromociones = Input.EstaSuscritoPromociones
 
-
                         };
 
                     _context.Usuario.Add(nuevoUsuario);

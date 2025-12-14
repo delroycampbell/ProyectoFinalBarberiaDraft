@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ProyectoFinalDraft.Data;
-using Microsoft.AspNetCore.Identity;
-using ProyectoFinalDraft.Models;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
+using ProyectoFinalDraft.Data;
 using ProyectoFinalDraft.Interfaces;
+using ProyectoFinalDraft.Models;
 using ProyectoFinalDraft.Services;
+using static System.Formats.Asn1.AsnWriter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,19 +63,18 @@ using (var scope = app.Services.CreateScope())
 
 
 // SEED DE ROLES
+
 using (var scope = app.Services.CreateScope())
     {
-    var RoleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = { "Admin", "Barbero", "Cliente" };
+    var services = scope.ServiceProvider;
 
-    foreach (var rol in roles)
-        {
-        if (!await RoleManager.RoleExistsAsync(rol))
-            {
-            await RoleManager.CreateAsync(new IdentityRole(rol));
-            }
-        }
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var context = services.GetRequiredService<AppDbContext>();
+
+    await SeedUsers.SeedAsync(userManager, roleManager, context);
     }
+
 
 if (!app.Environment.IsDevelopment())
     {
