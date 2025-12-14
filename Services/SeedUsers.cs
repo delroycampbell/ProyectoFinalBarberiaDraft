@@ -71,7 +71,7 @@ public class SeedUsers
             {
             UserName = email,
             Email = email,
-            EmailConfirmed = true,
+            EmailConfirmed = false,
             NombreCompleto = nombre,
             PhoneNumber = telefono
             };
