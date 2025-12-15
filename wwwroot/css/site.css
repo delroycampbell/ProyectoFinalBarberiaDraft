@@ -1,22 +1,140 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
+
+body {
+    background-image: url("../img/fondo-barberia.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* CAMBIO: NO se define color global para evitar que todo quede blanco */
+/* body {
+    color: white;
+} */
+
+.hero-text {
+    padding: 120px 20px;
+    background-color: rgba(0, 0, 0, 0.55); /* oscurece el fondo */
+    border-radius: 10px;
+    margin-bottom: 40px;
+}
+
+.hero-title {
+    color: white;
+    font-size: 4rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.hero-slogan {
+    color: #d4af37; /* dorado */
+    font-size: 1.5rem;
+    margin-top: 15px;
+    font-weight: 500;
+}
+/* CAMBIO: titulos principales con buen contraste */
+/* Color: dorado barberia */
+h1 {
+    color: #d4af37;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+}
+
+/* CAMBIO: texto general legible sobre fondo */
+/* Color: blanco roto */
+p {
+    color: #f5f5f5;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+/* Título de sección */
+h2 {
+    color: white;
+    font-weight: 600;
+}
+
+/* ===== EXCEPCIONES ===== */
+
+/* Cards */
+.card,
+.card p,
+.card h5,
+.card strong {
+    color: #111; /* negro suave para fondo claro */
+}
+
+/* ===== CAMBIO GLOBAL: TODAS LAS TABLAS ===== */
+
+/* CAMBIO: fondo oscuro translúcido para TODAS las tablas */
+/* Color: negro translúcido */
+table {
+    background-color: rgba(0, 0, 0, 0.70);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+    /* CAMBIO: texto general de tablas */
+    /* Color: blanco roto */
+    table,
+    table td {
+        color: #f5f5f5;
+    }
+
+        /* CAMBIO: encabezados de tablas */
+        /* Color: dorado */
+        table th {
+            color: #d4af37;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        /* CAMBIO: separadores de filas */
+        /* Color: blanco muy suave */
+        table tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        /* CAMBIO: links dentro de tablas */
+        /* Color: azul claro */
+        table a {
+            color: #4da3ff;
+        }
+
+            /* CAMBIO: hover de links */
+            /* Color: dorado claro */
+            table a:hover {
+                color: #ffd369;
+            }
+
+/* Formularios */
+input,
+select,
+textarea {
+    color: #111; /* texto oscuro */
+    background-color: #fff; /* fondo blanco */
+}
+

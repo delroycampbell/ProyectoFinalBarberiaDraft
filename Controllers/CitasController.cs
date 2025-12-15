@@ -107,16 +107,45 @@ namespace ProyectoFinalDraft.Controllers
          string ServiciosSeleccionados)
             {
 
-            if (string.IsNullOrEmpty(ServiciosSeleccionados))
+            if (string.IsNullOrWhiteSpace(ServiciosSeleccionados))
                 {
-                ModelState.AddModelError("", "Debe seleccionar al menos un servicio.");
+                ModelState.AddModelError("", "Debe seleccionar un servicio.");
 
-                ViewData["EstadoCitaId"] = new SelectList(_context.EstadoCita, "EstadoCitaId", "Nombre", cita.EstadoCitaId);
-                ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "NombreCompleto", cita.UsuarioId);
                 ViewData["Servicios"] = _context.Servicio.ToList();
+                ViewData["EstadoCitaId"] = new SelectList(
+                    _context.EstadoCita, "EstadoCitaId", "Nombre", cita.EstadoCitaId
+                );
+
+                if (User.IsInRole("Cliente"))
+                    {
+                    var identityUserId = User
+                        .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?
+                        .Value;
+
+                    var cliente = _context.Usuario
+                        .FirstOrDefault(u => u.IdentityUserId == identityUserId);
+
+                    ViewData["UsuarioId"] = new SelectList(
+                        new List<Usuario> { cliente },
+                        "UsuarioId",
+                        "NombreCompleto",
+                        cliente.UsuarioId
+                    );
+                    }
+                else
+                    {
+                    ViewData["UsuarioId"] = new SelectList(
+                        _context.Usuario,
+                        "UsuarioId",
+                        "NombreCompleto",
+                        cita.UsuarioId
+                    );
+                    }
 
                 return View(cita);
                 }
+
+
 
             try
                 {
