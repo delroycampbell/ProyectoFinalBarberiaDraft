@@ -2,21 +2,36 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProyectoFinalDraft.Data;
 using ProyectoFinalDraft.Models;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace ProyectoFinalDraft.Controllers
     {
+    [Authorize(Roles = "Admin")]
     public class UsuariosController : Controller
         {
         private readonly AppDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UsuariosController(AppDbContext context)
+        //public UsuariosController(AppDbContext context)
+        //    {
+        //    _context = context;
+        //    }
+
+        public UsuariosController(AppDbContext context,
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager)
             {
             _context = context;
+            _userManager = userManager;
+            _roleManager = roleManager;
             }
 
         // GET: Usuarios
@@ -58,22 +73,66 @@ namespace ProyectoFinalDraft.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UsuarioId,NombreCompleto,Telefono,Correo,RolId")] Usuario usuario)
+        public async Task<IActionResult> Create(
+            [Bind("NombreCompleto,Telefono,Correo,RolId")] Usuario usuario)
             {
-
             try
-                {
-                _context.Add(usuario);
-                //usuario.UsuarioId=
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-                }
-            catch (Exception) { }
+                { 
 
-            //Esta linea recarga la lista de roles si hay error de validación
+                // Obtener rol del sistema
+                var rolSistema = await _context.Rol.FindAsync(usuario.RolId);
+            if (rolSistema == null)
+                {
+                ModelState.AddModelError("RolId", "Rol inválido.");
+                ViewData["RolId"] = new SelectList(_context.Rol, "RolId", "Nombre", usuario.RolId);
+                return View(usuario);
+                }
+
+            // ===== 1. Crear IdentityUser =====
+            var identityUser = new ApplicationUser
+                {
+                UserName = usuario.Correo,
+                Email = usuario.Correo,
+                NombreCompleto = usuario.NombreCompleto,
+                PhoneNumber = usuario.Telefono
+                };
+
+            var identityResult = await _userManager.CreateAsync(identityUser, "Temp123!");
+
+            if (!identityResult.Succeeded)
+                {
+                foreach (var error in identityResult.Errors)
+                    {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
+                ViewData["RolId"] = new SelectList(_context.Rol, "RolId", "Nombre", usuario.RolId);
+                return View(usuario);
+                }
+
+
+            // ===== 2. Asignar rol Identity =====
+            await _userManager.AddToRoleAsync(identityUser, rolSistema.Nombre);
+
+            // ===== 3. Crear Usuario (tabla sistema) =====
+            usuario.IdentityUserId = identityUser.Id;
+
+            _context.Usuario.Add(usuario);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+                {
+                // RECOMENDADO mientras desarrollas
+                ModelState.AddModelError(string.Empty, ex.Message);
+                }
+
             ViewData["RolId"] = new SelectList(_context.Rol, "RolId", "Nombre", usuario.RolId);
             return View(usuario);
             }
+
+
 
         // GET: Usuarios/Edit/5
         public async Task<IActionResult> Edit(int? id)

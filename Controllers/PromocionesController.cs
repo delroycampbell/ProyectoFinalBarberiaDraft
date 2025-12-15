@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 
 namespace ProyectoFinalDraft.Controllers
     {
+    //Solo el Admin puede crear promos, solo el Cliente puede verlas
+    [Authorize(Roles = "Admin, Cliente")]
     public class PromocionesController : Controller
         {
         private readonly AppDbContext _context;
@@ -27,7 +29,7 @@ namespace ProyectoFinalDraft.Controllers
             _UserManager = userManager;
             }
 
-        [Authorize] //Solo visible para usuarios autenticados
+        [Authorize(Roles = "Cliente")]
 
         //Promociones/Subscribe
 
@@ -62,13 +64,13 @@ namespace ProyectoFinalDraft.Controllers
 
             }
 
-
+        [Authorize(Roles = "Admin")]
         // GET: Promociones
         public async Task<IActionResult> Index()
             {
             return View(await _context.Promocion.ToListAsync());
             }
-
+        [Authorize(Roles = "Admin")]
         // GET: Promociones/Details/5
         public async Task<IActionResult> Details(int? id)
             {
@@ -86,7 +88,7 @@ namespace ProyectoFinalDraft.Controllers
 
             return View(promocion);
             }
-
+        [Authorize(Roles = "Admin")]
         // GET: Promociones/Create
         public IActionResult Create()
             {
@@ -96,8 +98,10 @@ namespace ProyectoFinalDraft.Controllers
         // POST: Promociones/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("PromocionId,Titulo,Descripcion,FechaInicio,FechaFin,Descuento,ServicioId")] Promocion promocion)
             {
             if (ModelState.IsValid)
@@ -111,6 +115,7 @@ namespace ProyectoFinalDraft.Controllers
             }
 
         // GET: Promociones/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
             {
             if (id == null)
@@ -131,6 +136,7 @@ namespace ProyectoFinalDraft.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("PromocionId,Titulo,Descripcion,FechaInicio,FechaFin,Descuento,ServicioId")] Promocion promocion)
             {
             if (id != promocion.PromocionId)
@@ -162,6 +168,7 @@ namespace ProyectoFinalDraft.Controllers
             }
 
         // GET: Promociones/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
             {
             if (id == null)
@@ -176,12 +183,14 @@ namespace ProyectoFinalDraft.Controllers
                 return NotFound();
                 }
 
+
             return View(promocion);
             }
 
         // POST: Promociones/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
             {
             var promocion = await _context.Promocion.FindAsync(id);

@@ -1,16 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProyectoFinalDraft.Data;
 using ProyectoFinalDraft.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace ProyectoFinalDraft.Controllers
     {
+    [Authorize(Roles = "Admin, Barbero, Cliente")]
     public class FacturasController : Controller
         {
         private readonly AppDbContext _context;
@@ -23,8 +26,25 @@ namespace ProyectoFinalDraft.Controllers
         // GET: Facturas
         public async Task<IActionResult> Index()
             {
-            var appDbContext = _context.Factura.Include(f => f.Cita).Include(f => f.Usuario);
-            return View(await appDbContext.ToListAsync());
+            var facturas = _context.Factura
+                .Include(f => f.Cita)
+                .Include(f => f.Usuario)
+                .AsQueryable();
+
+            // A) Cliente: solo sus facturas
+            if (User.IsInRole("Cliente"))
+                {
+                var identityUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                var usuarioId = await _context.Usuario
+                    .Where(u => u.IdentityUserId == identityUserId)
+                    .Select(u => u.UsuarioId)
+                    .FirstOrDefaultAsync();
+
+                facturas = facturas.Where(f => f.UsuarioId == usuarioId);
+                }
+
+            return View(await facturas.ToListAsync());
             }
 
         // GET: Facturas/Details/5
@@ -49,6 +69,8 @@ namespace ProyectoFinalDraft.Controllers
             }
 
         // GET: Facturas/Create
+        [Authorize(Roles = "Admin, Barbero")]
+
         public IActionResult Create()
             {
             // Solo citas sin factura
@@ -68,6 +90,8 @@ namespace ProyectoFinalDraft.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "Admin, Barbero")]
+
         public async Task<IActionResult> GetFacturaDatos(int citaId)
             {
             var cita = await _context.Cita
@@ -149,80 +173,80 @@ namespace ProyectoFinalDraft.Controllers
 
 
 
-        // GET: Facturas/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-            {
-            if (id == null)
-                {
-                return NotFound();
-                }
+        //// GET: Facturas/Edit/5
+        //public async Task<IActionResult> Edit(int? id)
+        //    {
+        //    if (id == null)
+        //        {
+        //        return NotFound();
+        //        }
 
-            var factura = await _context.Factura.FindAsync(id);
-            if (factura == null)
-                {
-                return NotFound();
-                }
-            ViewData["CitaId"] = new SelectList(_context.Cita, "CitaId", "CitaId", factura.CitaId);
-            ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "Nombre", factura.UsuarioId);
-            return View(factura);
-            }
+        //    var factura = await _context.Factura.FindAsync(id);
+        //    if (factura == null)
+        //        {
+        //        return NotFound();
+        //        }
+        //    ViewData["CitaId"] = new SelectList(_context.Cita, "CitaId", "CitaId", factura.CitaId);
+        //    ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "Nombre", factura.UsuarioId);
+        //    return View(factura);
+        //    }
 
-        // POST: Facturas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("FacturaId,Fecha,Detalle,Total,CitaId,UsuarioId")] Factura factura)
-            {
-            if (id != factura.FacturaId)
-                {
-                return NotFound();
-                }
+        //// POST: Facturas/Edit/5
+        //// To protect from overposting attacks, enable the specific properties you want to bind to.
+        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(int id, [Bind("FacturaId,Fecha,Detalle,Total,CitaId,UsuarioId")] Factura factura)
+        //    {
+        //    if (id != factura.FacturaId)
+        //        {
+        //        return NotFound();
+        //        }
 
-            if (ModelState.IsValid)
-                {
-                try
-                    {
-                    _context.Update(factura);
-                    await _context.SaveChangesAsync();
-                    }
-                catch (DbUpdateConcurrencyException)
-                    {
-                    if (!FacturaExists(factura.FacturaId))
-                        {
-                        return NotFound();
-                        }
-                    else
-                        {
-                        throw;
-                        }
-                    }
-                return RedirectToAction(nameof(Index));
-                }
-            ViewData["CitaId"] = new SelectList(_context.Cita, "CitaId", "CitaId", factura.CitaId);
-            ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "Correo", factura.UsuarioId);
-            return View(factura);
-            }
+        //    if (ModelState.IsValid)
+        //        {
+        //        try
+        //            {
+        //            _context.Update(factura);
+        //            await _context.SaveChangesAsync();
+        //            }
+        //        catch (DbUpdateConcurrencyException)
+        //            {
+        //            if (!FacturaExists(factura.FacturaId))
+        //                {
+        //                return NotFound();
+        //                }
+        //            else
+        //                {
+        //                throw;
+        //                }
+        //            }
+        //        return RedirectToAction(nameof(Index));
+        //        }
+        //    ViewData["CitaId"] = new SelectList(_context.Cita, "CitaId", "CitaId", factura.CitaId);
+        //    ViewData["UsuarioId"] = new SelectList(_context.Usuario, "UsuarioId", "Correo", factura.UsuarioId);
+        //    return View(factura);
+        //    }
 
-        // GET: Facturas/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-            {
-            if (id == null)
-                {
-                return NotFound();
-                }
+        //// GET: Facturas/Delete/5
+        //public async Task<IActionResult> Delete(int? id)
+        //    {
+        //    if (id == null)
+        //        {
+        //        return NotFound();
+        //        }
 
-            var factura = await _context.Factura
-                .Include(f => f.Cita)
-                .Include(f => f.Usuario)
-                .FirstOrDefaultAsync(m => m.FacturaId == id);
-            if (factura == null)
-                {
-                return NotFound();
-                }
+        //    var factura = await _context.Factura
+        //        .Include(f => f.Cita)
+        //        .Include(f => f.Usuario)
+        //        .FirstOrDefaultAsync(m => m.FacturaId == id);
+        //    if (factura == null)
+        //        {
+        //        return NotFound();
+        //        }
 
-            return View(factura);
-            }
+        //    return View(factura);
+        //    }
 
         // POST: Facturas/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -239,9 +263,9 @@ namespace ProyectoFinalDraft.Controllers
             return RedirectToAction(nameof(Index));
             }
 
-        private bool FacturaExists(int id)
-            {
-            return _context.Factura.Any(e => e.FacturaId == id);
-            }
+        //private bool FacturaExists(int id)
+        //    {
+        //    return _context.Factura.Any(e => e.FacturaId == id);
+        //    }
         }
     }
