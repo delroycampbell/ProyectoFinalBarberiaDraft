@@ -7,27 +7,36 @@
 <h1>Agendar Cita</h1>
 <hr />
 
-<form asp-action="Create" class="col-md-5">
+<form asp-action="Create" method="post" class="col-md-5">
+
+    <!-- RESUMEN DE ERRORES -->
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 
     <!-- Fecha -->
     <div class="form-group mb-2">
         <label asp-for="Fecha"></label>
         <input asp-for="Fecha" class="form-control" />
+        <span asp-validation-for="Fecha" class="text-danger"></span>
     </div>
 
     <!-- Detalle -->
     <div class="form-group mb-2">
         <label asp-for="Detalle"></label>
         <input asp-for="Detalle" class="form-control" />
+        <span asp-validation-for="Detalle" class="text-danger"></span>
     </div>
-    <!-- La Cita se agenda siempre como "Agendada"-->
-    <input type="hidden" name="EstadoCitaId" value="2" />
 
+    <!-- Estado oculto -->
+    <input type="hidden" name="EstadoCitaId" value="2" />
 
     <!-- Cliente -->
     <div class="form-group mb-2">
         <label asp-for="UsuarioId">Cliente</label>
-        <select asp-for="UsuarioId" class="form-control" asp-items="ViewBag.UsuarioId"></select>
+        <select asp-for="UsuarioId"
+                class="form-control"
+                asp-items="ViewBag.UsuarioId">
+        </select>
+        <span asp-validation-for="UsuarioId" class="text-danger"></span>
     </div>
 
     <!-- Servicio Único -->
@@ -48,15 +57,13 @@
                 </option>
                 }
         </select>
-
     </div>
 
     <!-- Totales -->
     <div class="mt-3">
-
-        <strong>Subtotal: </strong> <span id="tSub">₡0.00</span><br />
-        <strong>IVA (13%): </strong> <span id="tIVA">₡0.00</span><br>
-        <strong>Total: </strong> <span id="tTotal">₡0.00</span>
+        <strong>Subtotal:</strong> <span id="tSub">₡0.00</span><br />
+        <strong>IVA (13%):</strong> <span id="tIVA">₡0.00</span><br />
+        <strong>Total:</strong> <span id="tTotal">₡0.00</span>
     </div>
 
     <!-- Botón Crear -->
@@ -67,17 +74,19 @@
 </form>
 
     @section Scripts {
+        @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+
     <script>
         function calcular() {
             const select = document.getElementById("servicio");
             const precio = parseFloat(select.options[select.selectedIndex]?.dataset?.precio || 0);
 
-            // Cálculos correctos
-            const subtotal = precio;       // precio original
-            const iva = subtotal * 0.13;   // 13% de IVA
-            const total = subtotal + iva;  // total final
+            const subtotal = precio;
+            const iva = subtotal * 0.13;
+            const total = subtotal + iva;
 
-            // Mostrar valores
             document.getElementById("tSub").innerText = "₡" + subtotal.toFixed(2);
             document.getElementById("tIVA").innerText = "₡" + iva.toFixed(2);
             document.getElementById("tTotal").innerText = "₡" + total.toFixed(2);

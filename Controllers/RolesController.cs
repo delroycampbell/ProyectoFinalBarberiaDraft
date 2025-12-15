@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoFinalDraft.Data;
@@ -7,6 +8,7 @@ using ProyectoFinalDraft.Models;
 
 namespace ProyectoFinalDraft.Controllers
     {
+    [Authorize(Roles = "Admin")]
     public class RolesController : Controller
         {
         private readonly AppDbContext _context;
