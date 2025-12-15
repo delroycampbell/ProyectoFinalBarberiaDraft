@@ -1,8 +1,52 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Pagina Principal";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <div class="hero-text text-center">
+        <h1 class="hero-title">Barbería Los Hermanos</h1>
+        <p class="hero-slogan">
+            Estilo, tradición y calidad en cada corte
+        </p>
+    </div>
+</div>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Nuestros Servicios</h2>
+
+    <div class="row">
+
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="~/img/corte1.jpg" class="card-img-top">
+                <div class="card-body text-center">
+                    <h5>Corte Clásico</h5>
+                    <p>Estilo tradicional</p>
+                    <strong>₡ 5000</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="~/img/corte2.jpg" class="card-img-top">
+                <div class="card-body text-center">
+                    <h5>Fade</h5>
+                    <p>Corte moderno</p>
+                    <strong>₡ 7000</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="~/img/barba.jpg" class="card-img-top">
+                <div class="card-body text-center">
+                    <h5>Barba</h5>
+                    <p>Perfilado profesional</p>
+                    <strong>₡ 4000</strong>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
