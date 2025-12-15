@@ -20,3 +20,64 @@ html {
 body {
   margin-bottom: 60px;
 }
+body {
+    background-image: url("../img/fondo-barberia.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+.hero-text {
+    padding: 120px 20px;
+    background-color: rgba(0, 0, 0, 0.55); /* oscurece el fondo */
+    border-radius: 10px;
+    margin-bottom: 40px;
+}
+
+.hero-title {
+    color: white;
+    font-size: 4rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.hero-slogan {
+    color: #d4af37; /* dorado */
+    font-size: 1.5rem;
+    margin-top: 15px;
+    font-weight: 500;
+}
+
+/* Título de sección */
+h2 {
+    color: white;
+    font-weight: 600;
+}
+/* ===== TEXTO GLOBAL BLANCO ===== */
+
+body {
+    color: white;
+}
+/* ===== EXCEPCIONES ===== */
+
+/* Cards */
+.card,
+.card p,
+.card h5,
+.card strong {
+    color: #111;
+}
+
+/* Tablas */
+.table,
+.table th,
+.table td {
+    color: #111;
+}
+
+/* Formularios */
+input,
+select,
+textarea,
+label {
+    color: #111;
+}
